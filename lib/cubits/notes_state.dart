@@ -1,6 +1,6 @@
 part of 'notes_cubit.dart';
 
-abstract class NotesState extends Equatable {
+abstract class NotesState {
   const NotesState();
 }
 

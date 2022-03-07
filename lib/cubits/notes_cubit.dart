@@ -1,8 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:cubitsqlitecrud/db/database_provider.dart';
 import 'package:cubitsqlitecrud/models/note.dart';
-import 'package:equatable/equatable.dart';
-
 part 'notes_state.dart';
 
 class NotesCubit extends Cubit<NotesState> {
