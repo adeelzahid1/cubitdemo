@@ -27,77 +27,61 @@ class NoteEditPage extends StatelessWidget {
   }
 }
 
-class NotesEditView extends StatelessWidget {
-  NotesEditView({
-    Key? key,
-    this.note,
-  }) : super(key: key);
+class NotesEditView extends StatefulWidget {
+  NotesEditView({Key? key, this.note,}) : super(key: key);
+  final Note? note;
+
+  @override
+  State<NotesEditView> createState() => _NotesEditViewState();
+}
+
+class _NotesEditViewState extends State<NotesEditView> {
 
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _title2Controller = TextEditingController();
-  final TextEditingController _contentController = TextEditingController();
-  // final TextEditingController _contentController = TextEditingController();
-  final FocusNode _titleFocusNode = FocusNode();
-  final FocusNode _title2FocusNode = FocusNode();
-  final FocusNode _contentFocusNode = FocusNode();
-  final Note? note;
+
+  late TextEditingController _titleController;
+  late TextEditingController _title2Controller;
+  late TextEditingController _contentController;
+
+  late FocusNode _titleFocusNode;
+  late FocusNode _title2FocusNode;
+  late FocusNode _contentFocusNode;
+
+
+  @override
+  void initState() {
+    _titleController = TextEditingController();
+    _title2Controller = TextEditingController();
+    _contentController = TextEditingController();
+
+    _titleFocusNode = FocusNode();
+    _title2FocusNode = FocusNode();
+    _contentFocusNode = FocusNode();
+
+    super.initState();
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
 // if editing an existing note, the form fields
     // are filled with the note attributes
-    if (note == null) {
+    if (widget.note == null) {
       _titleController.text = '';
       _title2Controller.text = '';
       _contentController.text = '';
     } else {
-      _titleController.text = note!.title;
-      _title2Controller.text = note!.title2 ?? "";
-      _contentController.text = note!.content;
+      _titleController.text = widget.note!.title;
+      _title2Controller.text = widget.note!.title2 ?? "";
+      _contentController.text = widget.note!.content;
     }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bloc SQLite Crud - Edit Note'),
       ),
       body: BlocListener<NotesCubit, NotesState>(
-        listener: (context, state) {
-// the state description is in the notes_state file and the states
-          // untreated here are used in the note list screen
-          // print(state.toString());
-          if (state is NotesInitial) {
-            const SizedBox();
-          } else if (state is NotesLoading) {
-            showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) {
-                  return const Center(
-                    child: CircularProgressIndicator.adaptive(),
-                  );
-                });
-          } else if (state is NotesSuccess) {
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(const SnackBar(
-                content: Text('Operation performed successfully'),
-              ));
-                // after the note is saved, the notes are retrieved again and
-            // the app re-displays the note list screen
-            Navigator.pop(context);
-            context.read<NotesCubit>().fetchNotes();
-          } else if (state is NotesLoaded) {
-            Navigator.pop(context);
-          } else if (state is NotesFailure) {
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(const SnackBar(
-                content: Text('Error updating grade'),
-              ));
-          }
-        },
+        listener: _listner,
         child: Form(
           key: _formKey,
           child: Padding(
@@ -187,7 +171,7 @@ class NotesEditView extends StatelessWidget {
                         if (_formKey.currentState!.validate()) {
                           // close keyboard
                           FocusScope.of(context).unfocus();
-                          context.read<NotesCubit>().saveNote(note?.id,
+                          context.read<NotesCubit>().saveNote(widget.note?.id,
                               _titleController.text, _title2Controller.text, _contentController.text);
                         }
                       },
@@ -208,38 +192,6 @@ class NotesEditView extends StatelessWidget {
                   },
                 ),
 
-
-
-
-
-
-              // TextFormField(
-              //   decoration: const InputDecoration(
-              //     labelText: 'Contents',
-              //   ),
-              //   maxLength : 1,
-              //   // controller: _contentController,
-              //   // focusNode: _contentFocusNode,
-              //   textInputAction: TextInputAction.done,
-              //   onChanged: (text) {
-              //     // validation is performed on every field change
-              //     // context.read<NoteValidationCubit>().validaForm(
-              //     //     _titleController.text, _contentController.text);
-              //   },
-              //   onFieldSubmitted: (String value) {
-              //     if (_formKey.currentState!.validate()) {
-              //       // close keyboard
-              //       // FocusScope.of(context).unfocus();
-              //       // context.read<NotesCubit>().saveNote(note?.id,
-              //       //     _titleController.text, _contentController.text);
-              //     }
-              //   },
-              //   autovalidateMode: AutovalidateMode.onUserInteraction,
-              //   validator: (value) {},
-              // ),
-
-
-
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: SizedBox(
@@ -256,7 +208,7 @@ class NotesEditView extends StatelessWidget {
                                     // close keyboard
                                     FocusScope.of(context).unfocus();
                                     context.read<NotesCubit>().saveNote(
-                                        note?.id,
+                                        widget.note?.id,
                                         _titleController.text,
                                         _title2Controller.text,
                                         _contentController.text);
@@ -275,5 +227,41 @@ class NotesEditView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _listner(BuildContext context, NotesState state){
+      if (state is NotesInitial) {
+        const SizedBox();
+      } else if (state is NotesLoading) {
+        showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              return const Center(
+                child: CircularProgressIndicator.adaptive(),
+              );
+            });
+      } else if (state is NotesSuccess) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(const SnackBar(
+            content: Text('Operation performed successfully'),
+          ));
+        // after the note is saved, the notes are retrieved again and
+        // the app re-displays the note list screen
+        Navigator.pop(context);
+        context.read<NotesCubit>().fetchNotes();
+      } else if (state is NotesLoaded) {
+        Navigator.pop(context);
+      } else if (state is NotesFailure) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(const SnackBar(
+            content: Text('Error updating grade'),
+          ));
+      }
+
   }
 }

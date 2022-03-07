@@ -1,6 +1,6 @@
 part of 'note_validation_cubit.dart';
 
-abstract class NoteValidationState extends Equatable {
+abstract class NoteValidationState {
   const NoteValidationState();
 }
 

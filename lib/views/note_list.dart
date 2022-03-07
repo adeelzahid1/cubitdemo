@@ -59,22 +59,6 @@ class DocumentsView extends StatelessWidget {
                 ),
               );
 
-
-              // showDialog<String>(
-              //   context: context,
-              //   builder: (BuildContext context) => AlertDialog(
-              //       title: const Text('Notes Are Empty'),
-              //       content: const Text('Please Add some notes !!!'),
-              //       actions: <Widget>[
-              //         TextButton(
-              //           onPressed: () => Navigator.pop(context),
-              //           child: const Text('Ok'),
-              //         ),
-              //       ]),
-              //   );
-
-
-
             },
           ),
         ],
@@ -119,7 +103,7 @@ class _Content extends StatelessWidget {
               Text('There are no notes. Click the button below to register.'),
         );
       } else {
-        return _NotesList(state.notes);
+        return _NotesList(state.notes!);
       }
     } else {
       return const Center(
@@ -131,22 +115,24 @@ class _Content extends StatelessWidget {
 
 class _NotesList extends StatelessWidget {
   const _NotesList(this.notes, {Key? key}) : super(key: key);
-  final List<Note>? notes;
+  final List<Note> notes;
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        for (final note in notes!) ...[
-          Padding(
+
+    return ListView.builder(
+        scrollDirection: Axis.vertical,
+        itemCount: notes.length,
+        itemBuilder: (context, index){
+          return   Padding(
             padding: const EdgeInsets.all(2.5),
             child: ListTile(
               tileColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
               ),
-              title: Text("${note.title} ${note.title2 ?? ""}"),
+              title: Text("$index ${notes[index].title} ${notes[index].title2 ?? ""}"),
               subtitle: Text(
-                note.content,
+                notes[index].content,
               ),
               trailing: Wrap(children: <Widget>[
                 IconButton(
@@ -155,9 +141,9 @@ class _NotesList extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          // the existing note is sent as a parameter to the
-                          // editing screen to fill in the fields automatically
-                          builder: (context) => NoteEditPage(note: note)),
+                        // the existing note is sent as a parameter to the
+                        // editing screen to fill in the fields automatically
+                          builder: (context) => NoteEditPage(note: notes[index])),
                     );
                   },
                 ),
@@ -177,7 +163,7 @@ class _NotesList extends StatelessWidget {
                             ),
                             TextButton(
                               onPressed: () {
-                                context.read<NotesCubit>().deleteNote(note.id);
+                                context.read<NotesCubit>().deleteNote(notes[index].id);
                                 Navigator.pop(context);
                                 ScaffoldMessenger.of(context)
                                   ..hideCurrentSnackBar()
@@ -193,12 +179,12 @@ class _NotesList extends StatelessWidget {
                     }),
               ]),
             ),
-          ),
+          );
           // const Divider(
           //   height: 2,
           // ),
-        ],
-      ],
+        }
     );
+
   }
 }

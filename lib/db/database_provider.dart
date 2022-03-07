@@ -38,8 +38,9 @@ class DatabaseProvider {
   Future<List<Note>> fetchNotes() async {
     final db = await instance.db;
     final result = await db.rawQuery('SELECT * FROM notes ORDER BY id');
-    // print(result);
-    return result.map((json) => Note.fromJson(json)).toList();
+     print(result.length);
+    // return result.map((json) => Note.fromJson(json)).toList();
+    return result.map((json) => Note.fromMap(json)).toList();
   }
 
 // create new note
@@ -50,7 +51,7 @@ class DatabaseProvider {
         [note.title, note.title2, note.content]);
 
 // print('Note id $id created successfully.');
-    return note.copy(id: id);
+    return note.copyWith(id: id);
   }
 
 // update grade

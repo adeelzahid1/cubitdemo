@@ -1,6 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-
 part 'note_validation_state.dart';
 
 class NoteValidationCubit extends Cubit<NoteValidationState> {
